@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "dev:staging": "astro dev --mode staging",
     "build": "astro check && astro build",
+    "build:staging": "astro check && astro build --mode staging",
     "preview": "astro preview",
     "check": "astro check"
   },

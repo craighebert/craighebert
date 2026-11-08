@@ -1,8 +1,18 @@
 // Helpers every page uses to read content. The visibility rule lives here, in one place.
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 
-/** True on staging (set PUBLIC_SHOW_DRAFTS=true). False everywhere else. */
-export const SHOW_DRAFTS = import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
+/**
+ * True on staging, false everywhere else. Comes from PUBLIC_SHOW_DRAFTS, which Astro reads
+ * at build time from the environment or from site/.env.<mode> (see `npm run build:staging`).
+ * Spaces and capitals are ignored, so "true", "True" and " true " all count.
+ */
+const rawShowDrafts = import.meta.env.PUBLIC_SHOW_DRAFTS;
+export const SHOW_DRAFTS = String(rawShowDrafts ?? '').trim().toLowerCase() === 'true';
+
+// Printed in the build log (and dev terminal) so you can see what the build actually saw.
+console.info(
+  `[content] Drafts ${SHOW_DRAFTS ? 'SHOWN' : 'hidden'} (PUBLIC_SHOW_DRAFTS=${JSON.stringify(rawShowDrafts)})`,
+);
 
 type Publishable = {
   data: { status: 'draft' | 'published'; visibility: 'public' | 'private'; publishedAt: Date };

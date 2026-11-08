@@ -5,8 +5,10 @@ node_modules/
 dist/
 .astro/
 
-# Environment files (secrets, local flags). Never commit these.
+# Environment files (secrets, local flags). Never commit these...
 .env*
+# ...except the staging mode file, which only holds public flags.
+!site/.env.staging
 
 # OS / editor noise
 .DS_Store
