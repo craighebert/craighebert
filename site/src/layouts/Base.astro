@@ -44,11 +44,17 @@ const nav = [...(settings.navigation ?? []), ...pageLinks];
       }
       header nav { display: flex; flex-wrap: wrap; gap: 1rem; }
       img, iframe { max-width: 100%; }
-      .staging { background: #fff3c4; padding: 0.5rem; }
+      .staging {
+        background: #fff3c4;
+        margin: -1rem -1rem 1rem;
+        padding: 0.25rem 1rem;
+        font-size: 0.85rem;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
-    {SHOW_DRAFTS && <p class="staging">Staging: drafts and scheduled items are visible.</p>}
+    {SHOW_DRAFTS && <p class="staging" role="status">STAGING – drafts visible</p>}
     <header>
       <nav>
         <a href="/"><strong>{settings.siteName}</strong></a>

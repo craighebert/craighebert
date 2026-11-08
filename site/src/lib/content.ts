@@ -2,16 +2,25 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 
 /**
- * True on staging, false everywhere else. Comes from PUBLIC_SHOW_DRAFTS, which Astro reads
- * at build time from the environment or from site/.env.<mode> (see `npm run build:staging`).
- * Spaces and capitals are ignored, so "true", "True" and " true " all count.
+ * Drafts are shown only when BOTH are true:
+ * 1. PUBLIC_SHOW_DRAFTS is "true" (from the environment or site/.env.<mode>, see
+ *    `npm run build:staging`). Spaces and capitals are ignored.
+ * 2. This is not a build of the `main` branch. Cloudflare Pages sets CF_PAGES_BRANCH on
+ *    every build, so production can never show drafts, whatever the variable says.
+ *    Locally CF_PAGES_BRANCH is unset, so only the variable matters.
+ * Both are read at build time; this code never runs in the visitor's browser.
  */
 const rawShowDrafts = import.meta.env.PUBLIC_SHOW_DRAFTS;
-export const SHOW_DRAFTS = String(rawShowDrafts ?? '').trim().toLowerCase() === 'true';
+const branch = process.env.CF_PAGES_BRANCH;
+const wantsDrafts = String(rawShowDrafts ?? '').trim().toLowerCase() === 'true';
+const isMainBranch = branch?.trim() === 'main';
+export const SHOW_DRAFTS = wantsDrafts && !isMainBranch;
 
 // Printed in the build log (and dev terminal) so you can see what the build actually saw.
 console.info(
-  `[content] Drafts ${SHOW_DRAFTS ? 'SHOWN' : 'hidden'} (PUBLIC_SHOW_DRAFTS=${JSON.stringify(rawShowDrafts)})`,
+  `[content] Drafts ${SHOW_DRAFTS ? 'SHOWN' : 'hidden'} ` +
+    `(PUBLIC_SHOW_DRAFTS=${JSON.stringify(rawShowDrafts)}, CF_PAGES_BRANCH=${JSON.stringify(branch)})` +
+    (wantsDrafts && isMainBranch ? ' — blocked: drafts never show on main' : ''),
 );
 
 type Publishable = {

@@ -51,10 +51,15 @@ Every item has `status` (draft / published), `visibility` (public / private) and
 | future `publishedAt` | hidden until the next build after that date | shown, marked "Scheduled" |
 | private | **never** | **never** |
 
-The switch is read **at build time**. Every build prints which way it went:
+Drafts show only when `PUBLIC_SHOW_DRAFTS` is `true` **and** the build is not of the `main`
+branch (Cloudflare sets `CF_PAGES_BRANCH` on every build). Production can never show drafts,
+whatever the variable says. When drafts are shown, every page has a "STAGING – drafts visible"
+banner and a `noindex` tag.
+
+Both are read **at build time**. Every build prints which way it went:
 
 ```
-[content] Drafts SHOWN (PUBLIC_SHOW_DRAFTS="true")
+[content] Drafts SHOWN (PUBLIC_SHOW_DRAFTS="true", CF_PAGES_BRANCH="staging")
 ```
 
 Ways to turn it on:
