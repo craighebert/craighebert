@@ -1,0 +1,17 @@
+# Image media item. The file itself will live in R2; this record only describes it.
+id: img-2026-11-cover
+slug: cover-2026-11
+title: "Desk setup, November 2026"
+summary: "Placeholder cover image used by the example content."
+status: draft
+visibility: public
+publishedAt: 2026-11-08T09:00:00-06:00
+kind: image
+host: r2
+source: images/2026/11/cover.jpg   # R2 object key
+alt: "A laptop and phone side by side on a wooden desk."
+caption: "Where the website gets edited."
+credit: Craig Hebert
+width: 2400
+height: 1600
+focalPoint: { x: 0.5, y: 0.4 }

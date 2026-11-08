@@ -1,0 +1,53 @@
+---
+// One page per visible post.
+import { getEntries, getEntry, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DraftBadge from '../../components/DraftBadge.astro';
+import YouTube from '../../components/YouTube.astro';
+import { formatDate, getMedia, getPosts, isVisible } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.data.slug }, props: { post } }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+
+const video = data.format === 'video' ? await getMedia(data.video) : undefined;
+const tags = data.tags ? await getEntries(data.tags) : [];
+const projectEntry = data.project ? await getEntry(data.project) : undefined;
+const project = projectEntry && isVisible(projectEntry) ? projectEntry : undefined;
+const linkedinShare = data.syndication?.find((s) => s.platform === 'linkedin');
+---
+
+<Base title={data.title} description={data.summary} type="article">
+  <article>
+    <h1>{data.title} <DraftBadge status={data.status} publishedAt={data.publishedAt} /></h1>
+    <p>
+      <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt)}</time>
+      {data.updatedAt && <> · updated {formatDate(data.updatedAt)}</>}
+      {data.series && <> · series: {data.series}</>}
+    </p>
+    {project && (
+      <p>Part of the <a href={`/projects/${project.data.slug}/`}>{project.data.title}</a> build log.</p>
+    )}
+
+    {video?.data.host === 'youtube' && <YouTube media={video} />}
+
+    <Content />
+
+    {tags.length > 0 && (
+      <p>Tags: {tags.map((t) => <a href={`/tags/${t.id}/`}>{t.data.label}</a>)}</p>
+    )}
+    {linkedinShare && <p><a href={linkedinShare.url}>Discuss on LinkedIn</a></p>}
+  </article>
+</Base>
+
+<style>
+  p a + a { margin-left: 0.5rem; }
+</style>

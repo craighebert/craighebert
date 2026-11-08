@@ -1,0 +1,11 @@
+---
+// Marks drafts and scheduled items. These only ever render on staging.
+interface Props {
+  status: 'draft' | 'published';
+  publishedAt: Date;
+}
+const { status, publishedAt } = Astro.props;
+const label = status === 'draft' ? 'Draft' : publishedAt > new Date() ? 'Scheduled' : null;
+---
+
+{label && <mark>{label}</mark>}

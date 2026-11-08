@@ -1,0 +1,65 @@
+---
+// The shared page shell: <head>, header navigation and footer.
+import { getPages, getSettings, SHOW_DRAFTS } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+}
+
+const settings = await getSettings();
+const { title, description = settings.tagline ?? '', type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} · ${settings.siteName}` : settings.siteName;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Header links: section links from settings, then visible pages that have a navOrder.
+const pageLinks = (await getPages())
+  .filter((p) => p.data.navOrder !== undefined)
+  .map((p) => ({ label: p.data.shortTitle ?? p.data.title, href: `/${p.data.slug}/` }));
+const nav = [...(settings.navigation ?? []), ...pageLinks];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {SHOW_DRAFTS && <meta name="robots" content="noindex" />}
+    <!-- Open Graph: what LinkedIn and others show in link previews. -->
+    <meta property="og:title" content={title ?? settings.siteName} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={settings.siteName} />
+    <style is:global>
+      body {
+        font-family: system-ui, sans-serif;
+        line-height: 1.6;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      header nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+      img, iframe { max-width: 100%; }
+      .staging { background: #fff3c4; padding: 0.5rem; }
+    </style>
+  </head>
+  <body>
+    {SHOW_DRAFTS && <p class="staging">Staging: drafts and scheduled items are visible.</p>}
+    <header>
+      <nav>
+        <a href="/"><strong>{settings.siteName}</strong></a>
+        {nav.map((link) => <a href={link.href}>{link.label}</a>)}
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>© {new Date().getFullYear()} {settings.siteName}. {settings.licence}</p>
+    </footer>
+  </body>
+</html>

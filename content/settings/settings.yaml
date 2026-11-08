@@ -1,0 +1,21 @@
+# Site-wide settings (one file). Not a "content item", so it has no
+# status/visibility. Media fields hold media IDs from content/media/.
+siteName: Craig Hebert
+tagline: Notes, videos and things I build.
+shortBio: I write and make videos about the things I'm building.
+longBio: |
+  Longer bio goes here. Markdown is allowed.
+profilePhoto: img-2026-11-cover
+defaultSocialImage: img-2026-11-cover
+social:
+  # linkedin: https://www.linkedin.com/in/your-profile/
+  # youtube: https://www.youtube.com/@your-channel
+# youtubeChannelId: UCxxxxxxxxxxxxxxxxxxxxxx
+# contactEmail: hello@example.com
+# Section links for the header. Pages with a navOrder are added after these.
+navigation:
+  - { label: Posts, href: /posts/ }
+  - { label: Videos, href: /videos/ }
+  - { label: Projects, href: /projects/ }
+# Open question in the content model: all rights reserved vs Creative Commons.
+licence: All rights reserved

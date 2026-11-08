@@ -1,0 +1,19 @@
+# YouTube media item. Public videos live on YouTube; the site embeds them.
+id: yt-2026-11-workflow-tour
+slug: workflow-tour-video
+title: "Phone-first website workflow"
+summary: "Video walkthrough of editing and publishing the site from a phone."
+kind: video
+host: youtube
+source: dQw4w9WgXcQ   # your YouTube video ID
+status: draft
+visibility: public
+publishedAt: 2026-11-10T09:00:00-06:00
+duration: 612
+youtube:
+  title: "How I edit my website from my phone"
+  chapters:
+    - { at: 0, title: "Intro" }
+    - { at: 95, title: "Editing on the phone" }
+transcript: |
+  Transcript goes here (copied from YouTube captions).

@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import DraftBadge from '../../components/DraftBadge.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Things I build.">
+  <h1>Projects</h1>
+  {projects.length === 0 ? (
+    <p>Nothing here yet.</p>
+  ) : (
+    <ul>
+      {projects.map(({ data }) => (
+        <li>
+          <a href={`/projects/${data.slug}/`}>{data.title}</a> <small>[{data.stage}]</small>{' '}
+          <DraftBadge status={data.status} publishedAt={data.publishedAt} />
+          <br />
+          {data.summary}
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>

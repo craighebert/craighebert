@@ -1,0 +1,66 @@
+# craighebert
+
+My personal website: a portfolio and creative media channel (posts, YouTube videos, projects).
+
+It's **headless**: content lives as plain files in `/content`, separate from any design.
+The website in `/site` is the first "head" that displays it. Others (feeds, a JSON API,
+LinkedIn sharing) read the same content.
+
+- Content model: [docs/content-model.md](docs/content-model.md)
+- Overall plan: [docs/website-plan.md](docs/website-plan.md)
+
+## Layout
+
+```
+content/            The content (the "body"). Markdown + YAML.
+  settings/         settings.yaml: site name, bio, navigation, licence
+  tags/             tags.yaml: every tag (id, label, description)
+  pages/            About, Contact, Uses, Now…      → /<slug>/
+  posts/            Articles, video posts, notes    → /posts/<slug>/
+  projects/         Things I build + build logs     → /projects/<slug>/
+  media/            One YAML record per image/video (files live in R2 or YouTube)
+site/               Astro website (static HTML)
+  src/content.config.ts   Schemas: the rules every content file must follow
+  src/lib/content.ts      Shared helpers, including the draft/private visibility rule
+  src/pages/              One file per URL
+docs/               Planning documents
+```
+
+## Run it locally
+
+Requires Node 26 (see `.nvmrc`).
+
+```sh
+cd site
+npm install
+npm run dev        # http://localhost:4321, live reload
+npm run build      # type-check + build static HTML into site/dist/
+npm run preview    # serve the built site
+```
+
+## Drafts, scheduled and private items
+
+Every item has `status` (draft / published), `visibility` (public / private) and `publishedAt`.
+
+| | Production | Staging (`PUBLIC_SHOW_DRAFTS=true`) |
+|---|---|---|
+| published, public, date passed | shown | shown |
+| draft | hidden | shown, marked "Draft" |
+| future `publishedAt` | hidden until the next build after that date | shown, marked "Scheduled" |
+| private | **never** | **never** |
+
+To preview drafts locally, create `site/.env` (it's git-ignored) containing:
+
+```
+PUBLIC_SHOW_DRAFTS=true
+```
+
+or run once with `PUBLIC_SHOW_DRAFTS=true npm run dev` (Git Bash).
+
+## Adding content
+
+1. Copy an existing file in the right `content/` folder.
+2. Give it a new, unique `id` (never change it later) and `slug` (the URL part).
+3. Run `npm run dev` or `npm run build`. If anything breaks a rule in the schema
+   (missing field, typo in a field name, unknown tag or media ID), the build stops and
+   tells you which file and field.

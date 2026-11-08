@@ -1,0 +1,13 @@
+---
+// Video posts only (format: video).
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib/content';
+
+const videos = (await getPosts()).filter((p) => p.data.format === 'video');
+---
+
+<Base title="Videos" description="Video posts, newest first.">
+  <h1>Videos</h1>
+  <PostList posts={videos} />
+</Base>

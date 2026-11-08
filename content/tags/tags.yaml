@@ -1,0 +1,10 @@
+# All tags in one file. The id is used in URLs: /tags/<id>
+- id: web
+  label: Web
+  description: Building for the web.
+- id: workflow
+  label: Workflow
+  description: How I make and publish things.
+- id: building-in-public
+  label: Building in public
+  description: Progress notes from projects as they happen.

@@ -1,0 +1,77 @@
+---
+// One page per visible project, with its build log (posts that point at this project).
+import { getEntries, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DraftBadge from '../../components/DraftBadge.astro';
+import YouTube from '../../components/YouTube.astro';
+import { formatDate, formatDay, getMedia, getPosts, getProjects } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.data.slug }, props: { project } }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+
+const video = await getMedia(data.video);
+const tags = data.tags ? await getEntries(data.tags) : [];
+// Build log: visible posts linked to this project, oldest first so it reads as a timeline.
+const buildLog = (await getPosts())
+  .filter((post) => post.data.project?.id === project.id)
+  .reverse();
+---
+
+<Base title={data.title} description={data.summary} type="article">
+  <article>
+    <h1>{data.title} <DraftBadge status={data.status} publishedAt={data.publishedAt} /></h1>
+    <p>
+      Stage: <strong>{data.stage}</strong>
+      {data.startedAt && <> · started {formatDay(data.startedAt)}</>}
+      {data.shippedAt && <> · shipped {formatDay(data.shippedAt)}</>}
+    </p>
+    {data.role && <p>Role: {data.role}</p>}
+    {data.stack && <p>Stack: {data.stack.join(', ')}</p>}
+    {data.collaborators && (
+      <p>
+        With:{' '}
+        {data.collaborators.map((c, i) => (
+          <>{i > 0 && ', '}{c.url ? <a href={c.url}>{c.name}</a> : c.name}</>
+        ))}
+      </p>
+    )}
+    {data.links && (
+      <ul>
+        {data.links.map((l) => <li><a href={l.url}>{l.label}</a> <small>({l.kind})</small></li>)}
+      </ul>
+    )}
+
+    {video?.data.host === 'youtube' && <YouTube media={video} />}
+
+    <Content />
+
+    <h2>Build log</h2>
+    {buildLog.length === 0 ? (
+      <p>No entries yet.</p>
+    ) : (
+      <ol>
+        {buildLog.map(({ data: post }) => (
+          <li>
+            <time datetime={post.publishedAt.toISOString()}>{formatDate(post.publishedAt)}</time>{' '}
+            <a href={`/posts/${post.slug}/`}>{post.title}</a>
+            {post.format === 'video' && ' (video)'}{' '}
+            <DraftBadge status={post.status} publishedAt={post.publishedAt} />
+          </li>
+        ))}
+      </ol>
+    )}
+
+    {tags.length > 0 && (
+      <p>Tags: {tags.map((t) => <><a href={`/tags/${t.id}/`}>{t.data.label}</a> </>)}</p>
+    )}
+  </article>
+</Base>

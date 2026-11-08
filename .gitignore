@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build output and Astro's generated cache
+dist/
+.astro/
+
+# Environment files (secrets, local flags). Never commit these.
+.env*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

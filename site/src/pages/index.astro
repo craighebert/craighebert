@@ -1,0 +1,31 @@
+---
+// Home: intro from settings, latest posts and featured projects.
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import { getPosts, getProjects, getSettings } from '../lib/content';
+
+const settings = await getSettings();
+const latestPosts = (await getPosts()).slice(0, 5);
+const featuredProjects = (await getProjects()).filter((p) => p.data.featured);
+---
+
+<Base>
+  <h1>{settings.siteName}</h1>
+  {settings.tagline && <p>{settings.tagline}</p>}
+  {settings.shortBio && <p>{settings.shortBio}</p>}
+
+  <h2>Latest posts</h2>
+  <PostList posts={latestPosts} />
+  <p><a href="/posts/">All posts →</a></p>
+
+  {featuredProjects.length > 0 && (
+    <>
+      <h2>Featured projects</h2>
+      <ul>
+        {featuredProjects.map(({ data }) => (
+          <li><a href={`/projects/${data.slug}/`}>{data.title}</a>: {data.summary}</li>
+        ))}
+      </ul>
+    </>
+  )}
+</Base>

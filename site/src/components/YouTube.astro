@@ -1,0 +1,55 @@
+---
+// Privacy-friendly YouTube player: nothing loads from YouTube until the visitor clicks,
+// and then it uses youtube-nocookie.com. Chapters and transcript are shown below.
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  media: CollectionEntry<'media'>;
+}
+const { data } = Astro.props.media;
+const title = data.youtube?.title ?? data.title;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${data.source}?autoplay=1`;
+const watchUrl = `https://www.youtube.com/watch?v=${data.source}`;
+const timestamp = (s: number) =>
+  `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+---
+
+<figure>
+  <div class="yt" data-embed={embedUrl} data-title={title}>
+    <button type="button">▶ Play video: {title}{data.duration ? ` (${timestamp(data.duration)})` : ''}</button>
+  </div>
+  <figcaption><a href={watchUrl}>Watch on YouTube</a></figcaption>
+</figure>
+
+{data.youtube?.chapters && (
+  <details>
+    <summary>Chapters</summary>
+    <ol>
+      {data.youtube.chapters.map((c) => (
+        <li><a href={`${watchUrl}&t=${c.at}s`}>{timestamp(c.at)}</a> {c.title}</li>
+      ))}
+    </ol>
+  </details>
+)}
+
+{data.transcript && (
+  <details>
+    <summary>Transcript</summary>
+    <div style="white-space: pre-line">{data.transcript}</div>
+  </details>
+)}
+
+<script>
+  // On click, swap the button for the real YouTube player.
+  document.querySelectorAll<HTMLElement>('.yt').forEach((el) => {
+    el.querySelector('button')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = el.dataset.embed ?? '';
+      iframe.title = el.dataset.title ?? 'YouTube video';
+      iframe.width = '640';
+      iframe.height = '360';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      el.replaceChildren(iframe);
+    });
+  });
+</script>

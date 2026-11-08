@@ -1,0 +1,30 @@
+---
+// A simple list of posts: date, title, summary.
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/content';
+import DraftBadge from './DraftBadge.astro';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+}
+const { posts } = Astro.props;
+---
+
+{posts.length === 0 ? (
+  <p>Nothing here yet.</p>
+) : (
+  <ul>
+    {posts.map(({ data }) => (
+      <li>
+        <a href={`/posts/${data.slug}/`}>{data.title}</a>{' '}
+        <small>
+          <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt)}</time>
+          {data.format !== 'article' && ` · ${data.format}`}
+        </small>{' '}
+        <DraftBadge status={data.status} publishedAt={data.publishedAt} />
+        <br />
+        {data.summary}
+      </li>
+    ))}
+  </ul>
+)}

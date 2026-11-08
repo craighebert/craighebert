@@ -1,0 +1,38 @@
+---
+// One page per tag in content/tags/tags.yaml, listing visible posts and projects with that tag.
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts, getProjects, hasTag } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const tags = await getCollection('tags');
+  return tags.map((tag) => ({ params: { tag: tag.id }, props: { tag } }));
+}
+
+interface Props {
+  tag: CollectionEntry<'tags'>;
+}
+const { tag } = Astro.props;
+const posts = (await getPosts()).filter((p) => hasTag(p, tag.id));
+const projects = (await getProjects()).filter((p) => hasTag(p, tag.id));
+---
+
+<Base title={`Tagged: ${tag.data.label}`} description={tag.data.description}>
+  <h1>Tagged: {tag.data.label}</h1>
+  {tag.data.description && <p>{tag.data.description}</p>}
+
+  <h2>Posts</h2>
+  <PostList posts={posts} />
+
+  {projects.length > 0 && (
+    <>
+      <h2>Projects</h2>
+      <ul>
+        {projects.map(({ data }) => (
+          <li><a href={`/projects/${data.slug}/`}>{data.title}</a>: {data.summary}</li>
+        ))}
+      </ul>
+    </>
+  )}
+</Base>

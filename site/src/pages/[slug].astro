@@ -1,0 +1,31 @@
+---
+// Standalone pages (About, Contact, Uses, Now) at the top level: /about/, /now/ ...
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import { getPages } from '../lib/content';
+
+export async function getStaticPaths() {
+  // Top-level URLs that belong to site sections, so a page can't use them as its slug.
+  // (Declared in here: getStaticPaths runs on its own and can't see other frontmatter variables.)
+  const RESERVED = ['posts', 'videos', 'projects', 'tags', 'watch', 'api', 'galleries'];
+  const pages = await getPages();
+  for (const page of pages) {
+    if (RESERVED.includes(page.data.slug)) {
+      throw new Error(`Page slug "${page.data.slug}" is reserved for a site section`);
+    }
+  }
+  return pages.map((page) => ({ params: { slug: page.data.slug }, props: { page } }));
+}
+
+interface Props {
+  page: CollectionEntry<'pages'>;
+}
+const { page } = Astro.props;
+const { Content } = await render(page);
+---
+
+<Base title={page.data.title} description={page.data.summary}>
+  <h1>{page.data.title} <DraftBadge status={page.data.status} publishedAt={page.data.publishedAt} /></h1>
+  <Content />
+</Base>
