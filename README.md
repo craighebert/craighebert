@@ -33,9 +33,11 @@ Requires Node 26 (see `.nvmrc`).
 ```sh
 cd site
 npm install
-npm run dev        # http://localhost:4321, live reload
-npm run build      # type-check + build static HTML into site/dist/
-npm run preview    # serve the built site
+npm run dev              # production view, http://localhost:4321, live reload
+npm run dev:staging      # staging view: drafts and scheduled items shown
+npm run build            # type-check + build static HTML into site/dist/
+npm run build:staging    # same, as staging
+npm run preview          # serve the built site
 ```
 
 ## Drafts, scheduled and private items
@@ -49,13 +51,26 @@ Every item has `status` (draft / published), `visibility` (public / private) and
 | future `publishedAt` | hidden until the next build after that date | shown, marked "Scheduled" |
 | private | **never** | **never** |
 
-To preview drafts locally, create `site/.env` (it's git-ignored) containing:
+Drafts show only when `PUBLIC_SHOW_DRAFTS` is `true` **and** the build is not of the `main`
+branch (Cloudflare sets `CF_PAGES_BRANCH` on every build). Production can never show drafts,
+whatever the variable says. When drafts are shown, every page has a "STAGING – drafts visible"
+banner and a `noindex` tag.
+
+Both are read **at build time**. Every build prints which way it went:
 
 ```
-PUBLIC_SHOW_DRAFTS=true
+[content] Drafts SHOWN (PUBLIC_SHOW_DRAFTS="true", CF_PAGES_BRANCH="staging")
 ```
 
-or run once with `PUBLIC_SHOW_DRAFTS=true npm run dev` (Git Bash).
+Ways to turn it on:
+
+- **Locally:** `npm run dev:staging` / `npm run build:staging`. These load `site/.env.staging`
+  and work in any terminal.
+- **Cloudflare Pages:** Settings → Variables and Secrets → **Preview** environment
+  (the `staging` branch is a preview deployment, not production) →
+  `PUBLIC_SHOW_DRAFTS` = `true`. Variables only apply to *new* builds, so redeploy afterwards.
+- **By hand in PowerShell:** `$env:PUBLIC_SHOW_DRAFTS = 'true'`
+  (not `set PUBLIC_SHOW_DRAFTS true`, which creates a PowerShell variable Astro can't see).
 
 ## Adding content
 
